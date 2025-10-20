@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from database.db_manager import SessionLocal
 from schemas.posts import PostCreate, PostResponse
@@ -16,28 +16,28 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/", response_model=PostResponse)
+@router.post("/", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
 def create_post(post: PostCreate, db: Session = Depends(get_db)):
     return crud.create_post(db, post)
 
-@router.get("/", response_model=list[PostResponse])
+@router.get("/", response_model=list[PostResponse], status_code=status.HTTP_200_OK)
 def read_posts(db: Session = Depends(get_db)):
     posts = crud.get_posts(db)
     return posts            
 
-@router.get("/{post_id}", response_model=PostResponse)
+@router.get("/{post_id}", response_model=PostResponse, status_code=status.HTTP_200_OK)
 def get_post(post_id: int, db: Session = Depends(get_db)):      
     db_post = crud.get_post(db, post_id)
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
     return db_post
 
-@router.get("/author/{author_id}", response_model=list[PostResponse])
+@router.get("/author/{author_id}", response_model=list[PostResponse], status_code=status.HTTP_200_OK)
 def get_posts_by_author(author_id: int, db: Session = Depends(get_db)):
     posts = crud.get_posts_by_author(db, author_id)
     return posts
 
-@router.delete("/{post_id}", response_model=dict)
+@router.delete("/{post_id}", response_model=dict, status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(post_id: int, db: Session = Depends(get_db)):
     success = crud.delete_post(db, post_id)
     if not success:

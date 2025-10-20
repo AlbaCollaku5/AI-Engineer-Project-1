@@ -35,12 +35,12 @@ def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
    db.refresh(db_author)
    return db_author
 
-@router.get("/", response_model=list[AuthorResponse])
+@router.get("/", response_model=list[AuthorResponse], status_code=status.HTTP_200_OK)
 def read_authors(db: Session = Depends(get_db)):
     authors = crud.get_authors(db)
     return authors
 
-@router.get("/{author_id}", response_model=AuthorResponse)
+@router.get("/{author_id}", response_model=AuthorResponse, status_code=status.HTTP_200_OK)
 def get_author(author_id: int, db: Session = Depends(get_db)):
     db_author = crud.get_author(db, author_id)
     if db_author is None:
